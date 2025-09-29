@@ -51,13 +51,13 @@ def submit_survey():
         rating=submission.rating,
         comments=submission.comments,
         user_agent=submission.user_agent,
-        submission_id=submission.submission_id,
+        submission_id=sha256(submission.submission_id) if submission.submission_id else None,  # HASH THIS!
         source=submission.source,
         received_at=datetime.now(timezone.utc),
         ip=request.headers.get("X-Forwarded-For", request.remote_addr or "")
     )
-
-    append_json_line(record.model_dump())
+    
+    append_json_line(record.dict())
     return jsonify({"status": "ok"}), 201
 
 if __name__ == "__main__":
