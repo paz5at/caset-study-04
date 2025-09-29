@@ -25,7 +25,7 @@ class SurveySubmission(BaseModel):
 
 
 #Good example of inheritance
-class StoredSurveyRecord(SurveySubmission):
+class StoredSurveyRecord(BaseModel):
     name: str
     email: str  # Now accepts hashed string
     age: str    # Now accepts hashed string
