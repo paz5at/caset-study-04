@@ -52,7 +52,7 @@ def submit_survey():
         ip=request.headers.get("X-Forwarded-For", request.remote_addr or "")
     )
     
-    append_json_line(record.dict())
+    append_json_line(record.model_dump())
     return jsonify({"status": "ok"}), 201
 
 if __name__ == "__main__":
