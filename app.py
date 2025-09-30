@@ -23,7 +23,7 @@ def ping():
 def sha256(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
-@app.post("/v1/survey")
+@app.route("/v1/survey", methods=["POST"])
 def submit_survey():
     payload = request.get_json(silent=True)
     if payload is None:
