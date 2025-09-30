@@ -29,14 +29,16 @@ def submit_survey():
     if payload is None:
         return jsonify({"error": "invalid_json", "detail": "Body must be application/json"}), 400
 
-    if not payload.get("submission_id"):
-        now = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
-        payload["submission_id"] = payload["email"] + now
-
     try:
         submission = SurveySubmission(**payload)
     except ValidationError as ve:
         return jsonify({"error": "validation_error", "detail": ve.errors()}), 422
+    
+    if not submission.submission_id:
+        now = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+        submission_id = submission.email + now
+    else:
+        submission_id = submission.submission_id
 
     record = StoredSurveyRecord(
         name=submission.name,
@@ -46,13 +48,13 @@ def submit_survey():
         rating=submission.rating,
         comments=submission.comments,
         user_agent=submission.user_agent,
-        submission_id=sha256(submission.submission_id) if submission.submission_id else None,  # HASH THIS!
+        submission_id=sha256(submission_id), 
         source=submission.source,
         received_at=datetime.now(timezone.utc),
         ip=request.headers.get("X-Forwarded-For", request.remote_addr or "")
     )
     
-    append_json_line(record.model_dump())
+    append_json_line(record.dict())
     return jsonify({"status": "ok"}), 201
 
 if __name__ == "__main__":
